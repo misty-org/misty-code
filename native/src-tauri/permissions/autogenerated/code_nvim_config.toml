@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-nvim-config"
+description = "Enables the code_nvim_config command without any pre-configured scope."
+commands.allow = ["code_nvim_config"]
+
+[[permission]]
+identifier = "deny-code-nvim-config"
+description = "Denies the code_nvim_config command without any pre-configured scope."
+commands.deny = ["code_nvim_config"]

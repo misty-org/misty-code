@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-db-save"
+description = "Enables the code_db_save command without any pre-configured scope."
+commands.allow = ["code_db_save"]
+
+[[permission]]
+identifier = "deny-code-db-save"
+description = "Denies the code_db_save command without any pre-configured scope."
+commands.deny = ["code_db_save"]

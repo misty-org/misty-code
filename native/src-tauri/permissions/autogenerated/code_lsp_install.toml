@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-lsp-install"
+description = "Enables the code_lsp_install command without any pre-configured scope."
+commands.allow = ["code_lsp_install"]
+
+[[permission]]
+identifier = "deny-code-lsp-install"
+description = "Denies the code_lsp_install command without any pre-configured scope."
+commands.deny = ["code_lsp_install"]

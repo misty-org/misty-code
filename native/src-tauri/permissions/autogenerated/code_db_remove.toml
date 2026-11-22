@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-db-remove"
+description = "Enables the code_db_remove command without any pre-configured scope."
+commands.allow = ["code_db_remove"]
+
+[[permission]]
+identifier = "deny-code-db-remove"
+description = "Denies the code_db_remove command without any pre-configured scope."
+commands.deny = ["code_db_remove"]

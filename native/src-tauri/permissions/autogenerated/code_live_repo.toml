@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-live-repo"
+description = "Enables the code_live_repo command without any pre-configured scope."
+commands.allow = ["code_live_repo"]
+
+[[permission]]
+identifier = "deny-code-live-repo"
+description = "Denies the code_live_repo command without any pre-configured scope."
+commands.deny = ["code_live_repo"]

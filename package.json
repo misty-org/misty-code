@@ -1,0 +1,21 @@
+{
+  "name": "@misty/code",
+  "version": "0.1.0",
+  "description": "Misty's Code page: an editor, language servers, a database browser, source control and live sessions, as a module that plugs back into Misty.",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "private": true,
+  "files": [
+    "src",
+    "native",
+    "integration"
+  ],
+  "peerDependencies": {
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/lint": "^6.9.8",
+    "@codemirror/lsp-client": "^6.3.1",
+    "@codemirror/merge": "^6.12.3",
+    "@replit/codemirror-vim": "^6.4.0",
+    "y-codemirror.next": "^0.3.6"
+  }
+}

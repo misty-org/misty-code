@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-db-cancel"
+description = "Enables the code_db_cancel command without any pre-configured scope."
+commands.allow = ["code_db_cancel"]
+
+[[permission]]
+identifier = "deny-code-db-cancel"
+description = "Denies the code_db_cancel command without any pre-configured scope."
+commands.deny = ["code_db_cancel"]

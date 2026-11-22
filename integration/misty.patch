@@ -1,0 +1,1019 @@
+--- a/src/features/agents/runs/local-run/runBody.ts
++++ b/src/features/agents/runs/local-run/runBody.ts
+@@ -103,7 +103,7 @@
+     personaInstructions(input.prompt).catch(() => ""),
+   ]);
+   const multirunFolder = await multirunFolderOf(conversationId);
+-  const inProject =
++  const inCode =
+     Boolean(conversationId) && (multirunFolder !== undefined || isProjectChat(conversationId));
+   const saved = input.permissionMode ?? (state.permissionMode || agent?.default_run_mode || "ask");
+   const chosenCollaboration = input.collaborationMode ?? (conversationId ? state.mode : undefined);
+@@ -145,9 +145,9 @@
+             name: agent?.name ?? "",
+             role: agent?.role ?? "",
+             instructions: [
+-              agent ? assembleAgentPrompt({ agent }).text : "",
++              agent ? assembleAgentPrompt({ agent, quiet: inCode }).text : "",
+               personas,
+-              conversationId && !inProject && engineId ? SCRATCH_CHAT_NOTE : "",
++              conversationId && !inCode && engineId ? SCRATCH_CHAT_NOTE : "",
+             ]
+               .filter(Boolean)
+               .join("\n\n"),
+--- a/src/app/layouts/DesktopLayout/spaceNavigation.ts
++++ b/src/app/layouts/DesktopLayout/spaceNavigation.ts
+@@ -1,5 +1,7 @@
+ import {
+   defaultAgentOf,
++  isProjectChat,
++  openCodeChat,
+   usePersonalAgentsStore,
+ } from "@/features/agents";
+ import {
+@@ -48,7 +50,9 @@
+ }
+ 
+ export function openChatRoute(agentId: string, conversationId: string) {
+-  return agentChatRoute(agentId, conversationId);
++  if (!isProjectChat(conversationId)) return agentChatRoute(agentId, conversationId);
++  openCodeChat(conversationId);
++  return "/agents?view=code";
+ }
+ 
+ export function agentChatRoute(agentId: string, conversationId?: string, fresh = false) {
+--- a/src/features/settings/settingsRegistry.tsx
++++ b/src/features/settings/settingsRegistry.tsx
+@@ -1,4 +1,5 @@
+ import {
++  CodeXml,
+   Keyboard,
+   Palette,
+   Search,
+@@ -25,6 +26,7 @@
+   | "advanced"
+   | "search"
+   | "files"
++  | "code"
+   | "agents";
+ 
+ interface SettingsAreaInfo {
+@@ -41,6 +43,7 @@
+   advanced: { label: "Advanced", icon: Wrench },
+   search: { label: "Search", icon: Search },
+   files: { label: "Files", icon: spaceIcons.files },
++  code: { label: "Code", icon: CodeXml },
+   agents: { label: "Agents", icon: Users },
+ };
+ 
+@@ -50,7 +53,7 @@
+     label: "App",
+     areas: ["general", "appearance", "input", "advanced"],
+   },
+-  { label: "Pages", areas: ["search", "files", "agents"] },
++  { label: "Pages", areas: ["search", "files", "code", "agents"] },
+ ];
+ 
+ interface SettingsBlock {
+@@ -96,6 +99,8 @@
+   block("advanced", "diagnostics", "Diagnostics"),
+   block("search", "search", "Sources"),
+   block("files", "thumbnails", "Thumbnails"),
++  block("code", "editor", "Editor"),
++  block("code", "collaboration", "Collaboration"),
+   block("agents", "agents-list", "Team", "resource"),
+   block("agents", "agents-defaults", "Conversations"),
+   block("agents", "agents-companion", "Tutor"),
+--- a/src/features/settings/settingsTypes.ts
++++ b/src/features/settings/settingsTypes.ts
+@@ -33,6 +33,8 @@
+   "advanced",
+   "fonts",
+   "accessibility",
++  "editor",
++  "collaboration",
+   "network",
+   "performance",
+   "diagnostics",
+--- a/src/app/SettingsSections.tsx
++++ b/src/app/SettingsSections.tsx
+@@ -5,7 +5,9 @@
+   AgentActivitySettings,
+   AgentDefaultsSection,
+   AgentPermissionsSection,
++  CollaborationSettings,
+   CompanionSection,
++  EditorSettings,
+   EngineSection,
+ } from "@/features/agents";
+ import {
+@@ -49,6 +51,8 @@
+   appearance: AppearanceSection,
+   fonts: FontsSection,
+   accessibility: AccessibilitySection,
++  editor: EditorSettings,
++  collaboration: CollaborationSettings,
+   shortcuts: ShortcutsSection,
+   voice: VoiceSection,
+   devices: DevicesSection,
+--- a/src/app/layouts/DesktopLayout/BottomBarItems.tsx
++++ b/src/app/layouts/DesktopLayout/BottomBarItems.tsx
+@@ -2,9 +2,11 @@
+   Activity,
+   AudioLines,
+   CircleHelp,
++  CircleX,
+   Clock,
+   Coins,
+   Cpu,
++  FileCode,
+   FolderOpen,
+   Gauge,
+   GitBranch,
+@@ -12,17 +14,23 @@
+   Info,
+   Keyboard,
+   LayoutDashboard,
++  Locate,
+   MessageSquareDot,
+   MousePointer2,
+   Orbit,
++  Palette,
+   PanelLeft,
+   PanelRight,
+   Plus,
++  RadioTower,
+   Search,
+   Server,
++  ServerCog,
+   ShieldCheck,
+   SquarePen,
++  SquareTerminal,
+   SunMoon,
++  TextCursorInput,
+   UsersRound,
+   WifiOff,
+   ZoomIn,
+@@ -35,6 +43,15 @@
+   ApprovalsStatus,
+   BranchStatus,
+   ChatModelStatus,
++  CodeBranchStatus,
++  CodeCursorStatus,
++  CodeLanguageStatus,
++  CodeLiveStatus,
++  CodeProblemsStatus,
++  CodeServerStatus,
++  CodeTerminalButton,
++  CodeThemeStatus,
++  CodeVimStatus,
+   ContextStatus,
+   CostStatus,
+   FolderStatus,
+@@ -169,7 +186,7 @@
+   },
+   branch: {
+     label: "Branch",
+-    description: "The branch of the focused chat, with its uncommitted lines.",
++    description: "The branch of the focused chat or Code page, with its uncommitted lines.",
+     icon: GitBranch,
+     side: "end",
+     Item: Branch,
+@@ -188,6 +205,62 @@
+     side: "end",
+     Item: forChat(RunTimeStatus),
+   },
++  codeVim: {
++    label: "Vim mode",
++    description: "On the Code page with vim on: normal, insert or visual.",
++    icon: TextCursorInput,
++    side: "end",
++    Item: forCode(CodeVimStatus),
++  },
++  codeLive: {
++    label: "Live session",
++    description: "On the Code page: the live session it's in, and who else is there.",
++    icon: RadioTower,
++    side: "end",
++    Item: forCode(CodeLiveStatus),
++  },
++  codeProblems: {
++    label: "Problems",
++    description: "On the Code page: the open file's errors and warnings.",
++    icon: CircleX,
++    side: "end",
++    Item: forCode(CodeProblemsStatus),
++  },
++  codeCursor: {
++    label: "Cursor position",
++    description: "On the Code page: the cursor's line and column.",
++    icon: Locate,
++    side: "end",
++    Item: forCode(CodeCursorStatus),
++  },
++  codeLanguage: {
++    label: "Language",
++    description: "On the Code page: the open file's language.",
++    icon: FileCode,
++    side: "end",
++    Item: forCode(CodeLanguageStatus),
++  },
++  codeServer: {
++    label: "Language server",
++    description: "On the Code page: the open file's language server, and its install.",
++    icon: ServerCog,
++    side: "end",
++    Item: forCode(CodeServerStatus),
++  },
++  codeTheme: {
++    label: "Editor theme",
++    description: "On the Code page: the editor's theme, to switch it in place.",
++    icon: Palette,
++    side: "end",
++    Item: forCode(CodeThemeStatus),
++  },
++  codeTerminal: {
++    label: "Terminal",
++    description: "On the Code page: shows or hides its terminal.",
++    icon: SquareTerminal,
++    side: "end",
++    Item: forCode(CodeTerminalButton),
++  },
+   newChat: {
+     label: "New chat",
+     description: "Starts a chat with the agent you used last.",
+@@ -306,8 +379,28 @@
+   };
+ }
+ 
+-const Branch = forChat(BranchStatus);
++function useFocusedCodeView(): string | null {
++  const view = useFocusedView();
++  const [path, query = ""] = (view?.route ?? "").split("?");
++  return view && path === "/agents" && new URLSearchParams(query).get("view") === "code"
++    ? view.id
++    : null;
++}
+ 
++function forCode(Status: ComponentType<{ viewId: string }>): ComponentType {
++  return function CodeItem() {
++    const viewId = useFocusedCodeView();
++    return viewId ? <Status viewId={viewId} /> : null;
++  };
++}
++
++const ChatBranch = forChat(BranchStatus);
++
++function Branch() {
++  const codeView = useFocusedCodeView();
++  return codeView ? <CodeBranchStatus viewId={codeView} /> : <ChatBranch />;
++}
++
+ function AgentActivity() {
+   const statuses = Object.values(useChatStatuses());
+   const working = statuses.filter((status) => status === "working").length;
+--- a/src/app/layouts/DesktopLayout/bottomBarStore.ts
++++ b/src/app/layouts/DesktopLayout/bottomBarStore.ts
+@@ -19,6 +19,14 @@
+   "branch",
+   "folder",
+   "runtime",
++  "codeVim",
++  "codeLive",
++  "codeProblems",
++  "codeCursor",
++  "codeLanguage",
++  "codeServer",
++  "codeTheme",
++  "codeTerminal",
+   "newChat",
+   "newTab",
+   "search",
+@@ -43,7 +51,15 @@
+ export const bottomBarDefaults: BottomBarLayout = {
+   start: ["agents", "server"],
+   end: [
++    "codeVim",
++    "codeLive",
+     "branch",
++    "codeProblems",
++    "codeCursor",
++    "codeLanguage",
++    "codeServer",
++    "codeTheme",
++    "codeTerminal",
+     "zoom",
+     "shortcuts",
+     "info",
+@@ -72,6 +88,7 @@
+       return;
+     }
+   };
++  if (!seen.has("codeVim") && !shown("branch")) seen.delete("branch");
+   for (const id of bottomBarItemIds) if (!seen.has(id) && !shown(id)) place(id);
+   return { start, end, known: [...bottomBarItemIds] };
+ }
+--- a/src/app/layouts/DesktopLayout/WorkspaceCanvas.tsx
++++ b/src/app/layouts/DesktopLayout/WorkspaceCanvas.tsx
+@@ -16,6 +16,7 @@
+ import { WorkspaceSidebar } from "./WorkspaceSidebar";
+ import { useClearTabsShortcut } from "./useClearTabsShortcut";
+ import { WorkspaceTabPanels } from "./WorkspaceTabPanels";
++import { WorkspaceBottomBar } from "./WorkspaceBottomBar";
+ import { TopEdge } from "./TopEdge";
+ import { LayoutPopup } from "./LayoutPopup";
+ import { WorkspaceTabBar } from "./WorkspaceTabBar";
+@@ -169,6 +170,10 @@
+           onClosed={navigateToActiveLayoutTab}
+         />
+         <WorkspaceTabPanels gridColumn={contentColumn} layout={layout} renderTree={dockTree} />
++        {location.pathname === routes.agents &&
++        new URLSearchParams(location.search).get("view") === "code" ? (
++          <WorkspaceBottomBar gridColumn={contentColumn} onOpen={openTab} />
++        ) : null}
+         <PaneSwapMode />
+         <LayoutPopup onApplied={navigateToActiveLayoutTab} />
+         <WorkspaceSearch onOpen={openTab} path={location.pathname} />
+--- a/src/features/agents/conversations/view/AgentMessage.tsx
++++ b/src/features/agents/conversations/view/AgentMessage.tsx
+@@ -19,6 +19,7 @@
+ import { AgentNotebookCard } from "./AgentNotebookCard";
+ import { AgentRunOutcome } from "./AgentRunOutcome";
+ import { GrantCards } from "./grants/GrantCard";
++import { OpenInCodeCard } from "../../code/OpenInCodeDialog";
+ import { AgentSubagents } from "./AgentSubagents";
+ import { EngineThinking } from "./engine/EngineThinking";
+ import { EngineTurnParts } from "./engine/EngineTurnParts";
+@@ -241,6 +242,9 @@
+             retryFrom={props.retryFrom}
+             onRetry={props.onRetry}
+           />
++        ) : null}
++        {props.conversationId ? (
++          <OpenInCodeCard conversationId={props.conversationId} message={message} />
+         ) : null}
+         {props.conversationId ? (
+           <AgentAnsweredQuestions
+--- a/src/features/agents/context-panel/AgentContextPanel.tsx
++++ b/src/features/agents/context-panel/AgentContextPanel.tsx
+@@ -6,6 +6,7 @@
+ import type { ContextPanelSurface } from "./contextPanelStore";
+ import { FilesBreadcrumbs } from "./files/FilesBreadcrumbs";
+ import { FilesPanel } from "./files/FilesPanel";
++import { OpenInCodeButton } from "../code/OpenInCodeDialog";
+ import { useChatFolder } from "../shared-folders/chatFolder";
+ import { ChatFolderPicker } from "./ChatFolderPicker";
+ import { ChangesPanel } from "./git/ChangesPanel";
+@@ -47,6 +48,7 @@
+             />
+           ) : null}
+           <div className="flex flex-none items-center gap-0.5" data-side-panel-trailing="">
++            {scratch ? <OpenInCodeButton conversationId={props.conversationId} /> : null}
+             <WorktreesButton folder={folder} conversationId={props.conversationId} />
+             <LaunchScriptButton chat={chat} folder={folder} />
+             <OpenInMenu folder={folder} />
+--- a/src/features/agents/context-panel/SessionPanel.tsx
++++ b/src/features/agents/context-panel/SessionPanel.tsx
+@@ -39,7 +39,8 @@
+ import { ChatFolderMenu } from "../plans/AgentFolderMenu";
+ import { useContextPanel } from "./contextPanelStore";
+ import { chatKey } from "../conversations/state/draftChat";
+-import { useChatFolder } from "../shared-folders/chatFolder";
++import { useChatFolder, isDraftChat } from "../shared-folders/chatFolder";
++import { OpenInCodeButton } from "../code/OpenInCodeDialog";
+ import { ChatFolderPicker } from "./ChatFolderPicker";
+ import { gitApi, type GitStatus } from "./git/gitApi";
+ import { LineCounts } from "./git/LineCounts";
+@@ -310,8 +311,10 @@
+           value={
+             kind === "project" ? (
+               <ChatFolderPicker conversationId={props.conversationId} compact />
+-            ) : (
++            ) : isDraftChat(props.conversationId) ? (
+               "Scratch"
++            ) : (
++              <OpenInCodeButton conversationId={props.conversationId} />
+             )
+           }
+         />
+--- a/src/features/agents/context-panel/files/folderFileSearch.ts
++++ b/src/features/agents/context-panel/files/folderFileSearch.ts
+@@ -1,3 +1,4 @@
++import { fileRoute, isCodePageShown } from "../../code/codePageStore";
+ import { useContextPanel } from "../contextPanelStore";
+ import { useChatFolders } from "../../shared-folders/chatFolder";
+ import { useFileIndex, type IndexEntry } from "./fileIndex";
+@@ -61,7 +62,7 @@
+ }
+ 
+ export function openFolderFile(path: string): string {
+-  useContextPanel.getState().show("files");
++  if (!isCodePageShown()) useContextPanel.getState().show("files");
+   void useFilesStore.getState().openFile(path);
+-  return "/agents";
++  return fileRoute();
+ }
+--- a/src/features/agents/context-panel/git/ChangesFileContextMenu.tsx
++++ b/src/features/agents/context-panel/git/ChangesFileContextMenu.tsx
+@@ -17,6 +17,7 @@
+   ContextMenuSeparator,
+   ContextMenuTrigger,
+ } from "@misty/ui";
++import { isCodePageShown } from "../../code/codePageStore";
+ import { useContextPanel } from "../contextPanelStore";
+ import { filesApi } from "../files/filesApi";
+ import { useFilesStore } from "../files/filesStore";
+@@ -37,7 +38,7 @@
+ 
+ export function openChangedFile(path: string) {
+   void useFilesStore.getState().openFile(path);
+-  useContextPanel.getState().show("files");
++  if (!isCodePageShown()) useContextPanel.getState().show("files");
+ }
+ 
+ export function ChangesFileMenu(props: {
+--- a/src-tauri/features/app/handlers/more_commands.rs
++++ b/src-tauri/features/app/handlers/more_commands.rs
+@@ -280,6 +280,36 @@
+             crate::project::git::project_git_init,
+             crate::project::git::project_git_tree_status,
+             crate::project::terminal::project_terminal_host_info,
++            crate::code::nvim::code_nvim_config,
++            crate::code::git_text::code_git_head_text,
++            crate::code::lsp::code_lsp_status,
++            crate::code::lsp::code_lsp_install,
++            crate::code::lsp::code_lsp_start,
++            crate::code::lsp::code_lsp_send,
++            crate::code::lsp::code_lsp_stop,
++            crate::code::db::code_db_list,
++            crate::code::db::code_db_save,
++            crate::code::db::code_db_remove,
++            crate::code::db::code_db_test,
++            crate::code::db::code_db_pick_sqlite,
++            crate::code::db::code_db_schema,
++            crate::code::db::code_db_query,
++            crate::code::db::code_db_cancel,
++            crate::code::db::code_db_update_row,
++            crate::code::live::code_live_repo,
++            crate::code::live::code_live_worktree_create,
++            crate::code::live::code_live_worktree_remove,
++            crate::code::live::code_live_base_file,
++            crate::code::live::code_live_write,
++            crate::code::live::code_live_watch,
++            crate::code::live::code_live_unwatch,
++            crate::code::live::code_live_reset,
++            crate::code::live::code_live_commit,
++            crate::code::live::code_live_merge,
++            crate::code::live::code_live_land_check,
++            crate::code::live::code_live_land,
++            crate::code::live::code_live_push,
++            crate::code::live::code_live_open_pr,
+             crate::engines::chat_folder::chat_folder,
+             crate::engines::chat_folder::chat_folder_choose,
+             crate::engines::chat_folder::chat_folder_use,
+--- a/src-tauri/features/app/lifecycle.rs
++++ b/src-tauri/features/app/lifecycle.rs
+@@ -52,6 +52,7 @@
+     if matches!(event, RunEvent::Exit) {
+         crate::agents::run_control::stop();
+         crate::project::terminal::close_all();
++        crate::code::lsp::close_all();
+         tauri::async_runtime::block_on(crate::engines::shutdown());
+         crate::engine_config::shutdown();
+         crate::spaces_drive::shutdown();
+--- a/src-tauri/features/browser/app_windows/lifecycle.rs
++++ b/src-tauri/features/browser/app_windows/lifecycle.rs
+@@ -174,6 +174,7 @@
+             crate::app::macos_window_effects::mac_rounded_corners::forget_window(label);
+             crate::browser::forget_closed_pages(window.app_handle());
+             crate::project::terminal::close_window(label);
++            crate::code::lsp::close_window(label);
+             crate::voice::speech::close_window(window.app_handle(), label);
+             if QUITTING.load(Ordering::SeqCst) {
+                 return;
+--- a/src-tauri/features/lib.rs
++++ b/src-tauri/features/lib.rs
+@@ -7,6 +7,7 @@
+ pub mod bots;
+ #[cfg(desktop)]
+ pub mod browser;
++pub mod code;
+ #[cfg(any(target_os = "macos", windows, target_os = "linux"))]
+ pub mod computer_use;
+ pub mod devices;
+--- a/src-tauri/Cargo.toml
++++ b/src-tauri/Cargo.toml
+@@ -100,9 +100,12 @@
+ serde_yaml = "0.9"
+ sysinfo = "0.36.1"
+ which = "7"
++tokio-postgres-rustls = "0.13"
++rustls-native-certs = "0.8"
+ flate2 = "1"
+ tar = "0.4"
+ zip = { version = "4", default-features = false, features = ["deflate"] }
++tokio-postgres = { version = "0.7", default-features = false, features = ["runtime", "with-chrono-0_4", "with-serde_json-1"] }
+ # Files (features/files): a names-only search index of the home folder, typo-tolerant (MIT), the
+ # live refresh of open folders (CC0-1.0) and walking a folder for its size and duplicates
+ # (MIT/Unlicense), as Kura used them.
+--- a/src-tauri/tauri-permissions/app_commands.in
++++ b/src-tauri/tauri-permissions/app_commands.in
+@@ -135,6 +135,36 @@
+     "chat_open_in_code",
+     "chat_scratch_clear",
+     "chat_scratch_usage",
++    "code_db_cancel",
++    "code_db_list",
++    "code_db_pick_sqlite",
++    "code_db_query",
++    "code_db_remove",
++    "code_db_save",
++    "code_db_schema",
++    "code_db_test",
++    "code_db_update_row",
++    "code_git_head_text",
++    "code_live_base_file",
++    "code_live_commit",
++    "code_live_land",
++    "code_live_land_check",
++    "code_live_merge",
++    "code_live_open_pr",
++    "code_live_push",
++    "code_live_repo",
++    "code_live_reset",
++    "code_live_unwatch",
++    "code_live_watch",
++    "code_live_worktree_create",
++    "code_live_worktree_remove",
++    "code_live_write",
++    "code_lsp_install",
++    "code_lsp_send",
++    "code_lsp_start",
++    "code_lsp_status",
++    "code_lsp_stop",
++    "code_nvim_config",
+     "direct_apps_catalog",
+     "direct_apps_check",
+     "direct_apps_icon",
+--- a/src-tauri/tauri-permissions/actions/actions.toml
++++ b/src-tauri/tauri-permissions/actions/actions.toml
+@@ -336,6 +336,36 @@
+   "allow-chat-open-in-code",
+   "allow-chat-scratch-clear",
+   "allow-chat-scratch-usage",
++  "allow-code-db-cancel",
++  "allow-code-db-list",
++  "allow-code-db-pick-sqlite",
++  "allow-code-db-query",
++  "allow-code-db-remove",
++  "allow-code-db-save",
++  "allow-code-db-schema",
++  "allow-code-db-test",
++  "allow-code-db-update-row",
++  "allow-code-git-head-text",
++  "allow-code-live-base-file",
++  "allow-code-live-commit",
++  "allow-code-live-land",
++  "allow-code-live-land-check",
++  "allow-code-live-merge",
++  "allow-code-live-open-pr",
++  "allow-code-live-push",
++  "allow-code-live-repo",
++  "allow-code-live-reset",
++  "allow-code-live-unwatch",
++  "allow-code-live-watch",
++  "allow-code-live-worktree-create",
++  "allow-code-live-worktree-remove",
++  "allow-code-live-write",
++  "allow-code-lsp-install",
++  "allow-code-lsp-send",
++  "allow-code-lsp-start",
++  "allow-code-lsp-status",
++  "allow-code-lsp-stop",
++  "allow-code-nvim-config",
+   "allow-engine-models",
+   "allow-engine-catalog",
+   "allow-engines-list",
+--- a/package.json
++++ b/package.json
+@@ -25,8 +25,12 @@
+   "dependencies": {
+     "@codemirror/autocomplete": "^6.20.4",
+     "@codemirror/commands": "^6.11.1",
++    "@codemirror/lang-sql": "^6.10.0",
+     "@codemirror/language": "^6.13.1",
+     "@codemirror/language-data": "^6.5.2",
++    "@codemirror/lint": "^6.9.8",
++    "@codemirror/lsp-client": "^6.3.1",
++    "@codemirror/merge": "^6.12.3",
+     "@codemirror/search": "^6.7.2",
+     "@codemirror/state": "^6.7.6",
+     "@codemirror/view": "^6.43.15",
+@@ -59,6 +63,7 @@
+     "@radix-ui/react-toggle": "^1.1.14",
+     "@radix-ui/react-tooltip": "^1.4.1",
+     "@replit/codemirror-indentation-markers": "^6.5.3",
++    "@replit/codemirror-vim": "^6.4.0",
+     "@tailwindcss/vite": "^4.3.1",
+     "@tanstack/react-virtual": "3.14.10",
+     "@tauri-apps/api": "^2.0.0",
+@@ -116,6 +121,7 @@
+     "tailwind-merge": "^3.6.0",
+     "three": "^0.187.0",
+     "tw-animate-css": "^1.4.0",
++    "y-codemirror.next": "^0.3.6",
+     "y-partyserver": "^2.2.0",
+     "yjs": "^13.6.27",
+     "zod": "4.6.7",
+--- a/src/features/agents/methods/AgentWorkspaceFrame.tsx
++++ b/src/features/agents/methods/AgentWorkspaceFrame.tsx
+@@ -6,6 +6,8 @@
+ import { useRailShown } from "../context-panel/railLayoutStore";
+ import { ChatSessionCard, ChatSidePanels } from "../context-panel/ChatSidePanels";
+ import { isUnread, markConversationRead } from "./conversationReads";
++import { LabInSpace } from "../tutor/LabInSpace";
++import { CodePage } from "../code/CodePage";
+ import { cn, Separator, Surface } from "@misty/ui";
+ import { AgentMemoryPage } from "../memory/AgentMemoryPage";
+ import { createPort } from "@/shared/lib/seams";
+@@ -34,7 +36,7 @@
+ 
+ const isRunInProgress = (state?: string) => state === "running" || state === "queued";
+ 
+-export type AgentWorkspacePage = "task" | "files" | "memory";
++export type AgentWorkspacePage = "task" | "lab" | "code" | "files" | "memory";
+ type RecentConversation = {
+   id: string;
+   title?: string;
+@@ -108,6 +110,8 @@
+             {page === "task" ? (
+               <ChatSessionCard conversationId={conversationId} agent={agent} />
+             ) : null}
++            {page === "lab" ? <LabInSpace agent={agent} /> : null}
++            {page === "code" ? <CodePage /> : null}
+             {page === "files" ? <FilesPageSlot /> : null}
+             {page === "memory" ? (
+               <AgentMemoryPage
+--- a/src/features/agents/page/useAgentsPageState.ts
++++ b/src/features/agents/page/useAgentsPageState.ts
+@@ -215,12 +215,15 @@
+ export type AgentsPageState = ReturnType<typeof useAgentsPageState>;
+ 
+ const workspacePageTitles: Record<Exclude<AgentWorkspacePage, "task">, string> = {
++  lab: "Lab",
++  code: "Code",
+   files: "Files",
+   memory: "Memory",
+ };
+ 
+ function pageFromView(view: string): AgentWorkspacePage | undefined {
+-  if (view === "files" || view === "memory") return view;
++  if (view === "tutor" || view === "notebooks") return "lab";
++  if (view === "lab" || view === "code" || view === "files" || view === "memory") return view;
+   return undefined;
+ }
+ 
+--- a/src/features/agents/index.ts
++++ b/src/features/agents/index.ts
+@@ -26,6 +26,7 @@
+ export { DirectApps } from "./connected-apps/DirectApps";
+ export { AgentAvatar, AgentMark } from "./personal/AgentAvatar";
+ export { useLessonStore } from "./tutor/lessons/lessonStore";
++export { tutorChatIds, useTutorChatIds, useTutorStore } from "./tutor/tutorStore";
+ 
+ export { BrowserContextMenuBridge } from "./conversations/context/BrowserContextMenuBridge";
+ export { MistyContextBridgeHost } from "./conversations/context/MistyContextBridgeHost";
+@@ -64,6 +65,9 @@
+ 
+ export { spaceAgentsApi, type SpaceAgent } from "./api/space-agents";
+ export { spacesGateway } from "./spaces-gateway/spacesGateway";
++export { EditorSettings } from "./code/vim/EditorSettings";
++export { CollaborationSettings } from "./code/live/CollaborationSettings";
++export { openCodeChat } from "./code/sessions/CodeChatColumn";
+ export { findVocative, routeToAgent } from "./tutor/cursor/vocativeRoute";
+ 
+ export { openMisty } from "./conversations/ask/handoff";
+@@ -119,6 +123,8 @@
+ export { PickUpDialog } from "./pickup/PickUpDialog";
+ export { pickUpRequest, pickUpTopic } from "./pickup/pickUp";
+ export { HappeningNow } from "./activity/HappeningNow";
++export { LabDoing } from "./tutor/LabDoing";
++export { SpaceLab, SpaceLabSkeleton } from "./tutor/SpaceLab";
+ export { runOnEngine } from "./engines/engineRun";
+ export { cleanupOnEngine } from "./engines/mistyCalls";
+ export { EngineSection } from "./engines/EngineSection";
+@@ -128,7 +134,9 @@
+   setDefaultEngine,
+   useDefaultEngine,
+ } from "./engines/defaultEngine";
+-export { personColor, personTone } from "@/shared/lib/personTone";
++export { notebookRoute } from "./tutor/notebookSpace";
++export { PersonAvatar } from "./tutor/notebook/LivePeople";
++export { personColor, personTone } from "./tutor/personTone";
+ export { useSpaceRuns } from "./activity/useSpaceRuns";
+ export { AgentActivitySettings } from "./activity/AgentActivitySettings";
+ 
+@@ -137,6 +145,7 @@
+ export { messageSearchText } from "./conversations/view/navigation/timelineSearch";
+ export { searchEngineSessions } from "./conversations/view/engine/engineHistory";
+ export { defaultEngineAgent } from "./engines/defaultEngine";
++export { searchNotebooks } from "./tutor/tutorSearch";
+ export { directAppsApi } from "./connected-apps/directApi";
+ export { openFolderFile, searchFolderFiles } from "./context-panel/files/folderFileSearch";
+ export { tourCorner, type AgentSurfaceTour } from "./TourCorner";
+@@ -152,6 +161,18 @@
+   TutorStatus,
+   UnreadStatus,
+ } from "./BottomBarStatus";
++export {
++  CodeBranchStatus,
++  CodeCursorStatus,
++  CodeLanguageStatus,
++  CodeLiveStatus,
++  CodeProblemsStatus,
++  CodeServerStatus,
++  CodeTerminalButton,
++  CodeThemeStatus,
++  CodeVimStatus,
++} from "./code/CodeBarStatus";
++
+ export { loadRunEntry } from "./tools/runContexts";
+ 
+ export {
+--- a/src/app/layouts/DesktopLayout/sidebarPinsStore.ts
++++ b/src/app/layouts/DesktopLayout/sidebarPinsStore.ts
+@@ -2,7 +2,7 @@
+ import { readDeviceState, updateDeviceState } from "@/features/agents";
+ import { announceDeviceSetting, onDeviceSettingChange } from "@/shared/lib/deviceSetting";
+ 
+-export const sidebarPlaceIds = ["files"] as const;
++export const sidebarPlaceIds = ["files", "lab", "code"] as const;
+ export type SidebarPlaceId = (typeof sidebarPlaceIds)[number];
+ 
+ interface SidebarPins {
+--- a/src/app/layouts/DesktopLayout/SpaceNavigator.tsx
++++ b/src/app/layouts/DesktopLayout/SpaceNavigator.tsx
+@@ -7,7 +7,10 @@
+   useChatSectionsStore,
+   useLessonStore,
+   useMistyStore,
++  tutorChatIds,
++  useTutorStore,
+   usePersonalAgentsStore,
++  useProjectChats,
+ } from "@/features/agents";
+ import { dockLeaves, useWorkspaceStore, type WorkspaceView } from "@/features/app-windows";
+ import {
+@@ -64,7 +67,7 @@
+ 
+ const ExploreIcon = spaceIcons.explore;
+ 
+-const placeLabels: Record<SidebarPlaceId, string> = { files: "Files" };
++const placeLabels: Record<SidebarPlaceId, string> = { files: "Files", lab: "Lab", code: "Code" };
+ 
+ function useFocusedRoute(): string {
+   return useWorkspaceStore((state) => {
+@@ -253,11 +256,15 @@
+   const conversationsError = useMistyStore((state) => state.conversationsError);
+   const [chatsReadFor, setChatsReadFor] = useState<string | null>(null);
+   const lessons = useLessonStore((state) => state.lessons);
++  const tutorJobs = useTutorStore((state) => state.jobs);
++  const tutorNotebooks = useTutorStore((state) => state.notebooks);
+   const route = useFocusedRoute();
+   const statuses = useChatStatuses();
++  const projectChats = useProjectChats();
+   useEffect(() => {
+     void usePersonalAgentsStore.getState().load(accountId);
+     void useLessonStore.getState().load(accountId);
++    void useTutorStore.getState().load(accountId);
+     void useChatSectionsStore
+       .getState()
+       .load(accountId)
+@@ -270,28 +277,35 @@
+       .finally(() => setChatsReadFor(accountId));
+   }, [accountId]);
+   const chatsPending =
+-    !conversations.length && (conversationsLoading || chatsReadFor !== accountId);
++    (!conversations.length && (conversationsLoading || chatsReadFor !== accountId)) ||
++    projectChats === null;
+ 
+   const chats = useMemo(() => {
++    const made = tutorChatIds(tutorJobs, tutorNotebooks);
+     return (
+       conversations
+         .filter(
+           (chat) =>
+             chat.messages.length > 0 &&
+             !chat.place &&
+-            !lessons[chat.id],
++            !projectChats?.[chat.id] &&
++            !lessons[chat.id] &&
++            !made.has(chat.id),
+         )
+         .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+     );
+-  }, [conversations, lessons]);
++  }, [conversations, projectChats, lessons, tutorJobs, tutorNotebooks]);
+   const [path, query = ""] = route.split("?");
+   const params = new URLSearchParams(query);
+   const view = path === "/agents" ? params.get("view") : null;
+   const openChat = path === "/agents" && !view ? params.get("conversation") : null;
++  const base = space ? `/spaces/${encodeURIComponent(space.id)}` : "";
+   const open = (target: string) => openWorkspaceRoute(target, onOpen);
+   useEffect(() => void useSidebarPins.getState().load(), []);
+   const placeRoutes: Record<SidebarPlaceId, string> = {
+     files: "/agents?view=files",
++    lab: `${base}/lab`,
++    code: "/agents?view=code",
+   };
+   const places = Object.fromEntries(
+     (Object.keys(placeLabels) as SidebarPlaceId[]).map((id) => [
+@@ -299,7 +313,11 @@
+       {
+         label: placeLabels[id],
+         icon: spaceIcons[id],
+-        current: view === id,
++        current:
++          id === "code" || id === "files"
++            ? view === id
++            : Boolean(space) &&
++              (path === placeRoutes[id] || path.startsWith(`${placeRoutes[id]}/`)),
+         open: () => open(placeRoutes[id]),
+       } satisfies SidebarPlace,
+     ]),
+--- a/src/app/layouts/DesktopLayout/search/useSearchHits.tsx
++++ b/src/app/layouts/DesktopLayout/search/useSearchHits.tsx
+@@ -1,7 +1,10 @@
+ import {
+   Armchair,
++  CodeXml,
+   GraduationCap,
+   MessagesSquare,
++  NotebookPen,
++  FlaskConical,
+   Galaxy,
+   Plus,
+   Settings,
+@@ -15,10 +18,15 @@
+   askInNewChat,
+   messageSearchText,
+   requestChatFind,
++  tutorChatIds,
+   useLessonStore,
+   useMistyStore,
+   defaultAgentOf,
+   usePersonalAgentsStore,
++  useTutorStore,
++  notebookRoute,
++  openCodeChat,
++  useProjectChats,
+ } from "@/features/agents";
+ import { useCommands } from "@/features/commands";
+ import { openSettings, searchSettings } from "@/features/settings";
+@@ -35,6 +43,8 @@
+ const pages: { label: string; icon: LucideIcon; route(base: string): string; space?: boolean }[] = [
+   { label: "Space", icon: Galaxy, route: (base) => base, space: true },
+   { label: "Studio", icon: Armchair, route: () => "/agents?view=studio" },
++  { label: "Code", icon: CodeXml, route: () => "/agents?view=code" },
++  { label: "Lab", icon: FlaskConical, route: (base) => `${base}/lab`, space: true },
+   { label: "Chat", icon: MessagesSquare, route: (base) => `${base}/chat`, space: true },
+   { label: "Files", icon: spaceIcons.files, route: () => "/agents?view=files" },
+ ];
+@@ -49,6 +59,7 @@
+   Settings: 0.9,
+   Commands: 0.9,
+   Notebooks: 1,
++  "In notebooks": 0.8,
+   Messages: 0.8,
+   "Engine history": 0.7,
+   Apps: 0.7,
+@@ -76,7 +87,10 @@
+   const base = spaceId ? `/spaces/${encodeURIComponent(spaceId)}` : "";
+   const agents = usePersonalAgentsStore((state) => state.agents);
+   const conversations = useMistyStore((state) => state.conversations);
++  const projectChats = useProjectChats();
+   const lessons = useLessonStore((state) => state.lessons);
++  const tutorJobs = useTutorStore((state) => state.jobs);
++  const notebooks = useTutorStore((state) => state.notebooks);
+   const gallery = useSpaceGallery(spaceId, user?.id ?? "");
+   const commands = useCommands();
+   const uses = useSearchUses((state) => state.uses);
+@@ -92,6 +106,7 @@
+   const local = useMemo(() => {
+     const hits: SearchHit[] = [];
+     const typed = words.length > 0;
++    const tutorMade = tutorChatIds(tutorJobs, notebooks);
+ 
+     for (const page of pages) {
+       if (page.space && !base) continue;
+@@ -131,18 +146,23 @@
+ 
+     for (const chat of conversations) {
+       if (!chat.messages.length || chat.place) continue;
+-      if (lessons[chat.id]) continue;
++      if (lessons[chat.id] || tutorMade.has(chat.id)) continue;
+       const agent = agentOf(chat.agentId);
+       if (!agent) continue;
+       const title = chat.title || "New conversation";
+-      const go = () => openRoute(agentChatRoute(agent.id, chat.id));
++      const inCode = Boolean(projectChats?.[chat.id]);
++      const route = inCode ? "/agents?view=code" : agentChatRoute(agent.id, chat.id);
++      const go = () => {
++        if (inCode) openCodeChat(chat.id);
++        openRoute(route);
++      };
+       if (!typed) {
+         hits.push({
+           id: `chat:${chat.id}`,
+           kind: "chats",
+           group: "Chats",
+           title,
+-          detail: agent.name,
++          detail: inCode ? "Code" : agent.name,
+           icon: <AgentAvatar agent={agent} compact />,
+           updatedAt: chat.updatedAt,
+           match: 0,
+@@ -169,7 +189,7 @@
+         kind: "chats",
+         group: "Chats",
+         title,
+-        detail: agent.name,
++        detail: inCode ? "Code" : agent.name,
+         excerpt: inside ? excerpt(said, words) : undefined,
+         icon: <AgentAvatar agent={agent} compact />,
+         updatedAt: chat.updatedAt,
+@@ -216,6 +236,22 @@
+       });
+     }
+ 
++    for (const notebook of Object.values(notebooks)) {
++      const match = typed ? matchScore(notebook.title, words) : 0;
++      if (typed && !match) continue;
++      hits.push({
++        id: `notebook:${notebook.id}`,
++        kind: "learn",
++        group: "Notebooks",
++        title: notebook.title || "Untitled notebook",
++        detail: "Notebook",
++        icon: notebook.emoji ? <span aria-hidden>{notebook.emoji}</span> : icon(NotebookPen),
++        updatedAt: notebook.updatedAt,
++        match,
++        open: () => openRoute(notebookRoute(notebook)),
++      });
++    }
++
+     for (const item of gallery.items) {
+       const match = typed ? fieldScore(words, item.title, item.excerpt) : 0;
+       if (typed && !match) continue;
+@@ -257,7 +293,10 @@
+     base,
+     commands,
+     conversations,
++    projectChats,
+     lessons,
++    tutorJobs,
++    notebooks,
+     gallery.items,
+     agents,
+     agentOf,
+@@ -269,6 +308,7 @@
+     spaceId,
+     words,
+     asking,
++    notebooks,
+     agents,
+     openRoute,
+   });
+--- a/src/features/agents/tutor/cursor/tutorHandoff.ts
++++ b/src/features/agents/tutor/cursor/tutorHandoff.ts
+@@ -11,7 +11,9 @@
+ import { homeSpaceOf, ownSpaceOf } from "../../personal/agentHomeSpace";
+ import { usePersonalAgentsStore } from "../../personal/personalAgentsStore";
+ import { useLocalExecution } from "../../runs/local-execution/localExecutionState";
++import { useChatFolders } from "../../shared-folders/chatFolder";
+ import { useLessonStore } from "../lessons/lessonStore";
++import { tutorChatIds, useTutorStore } from "../tutorStore";
+ import type { DisplayCapture } from "./protocol";
+ 
+ export function handoffAgents(): AgentProfile[] {
+@@ -33,7 +35,10 @@
+ }
+ 
+ export function agentThreadId(agentId: string): string | undefined {
++  const projectChats = useChatFolders.getState().projectChats ?? {};
+   const lessons = useLessonStore.getState().lessons;
++  const { jobs, notebooks } = useTutorStore.getState();
++  const made = tutorChatIds(jobs, notebooks);
+   let thread: { id: string; updatedAt: string } | undefined;
+   for (const chat of useMistyStore.getState().conversations)
+     if (
+@@ -41,7 +46,9 @@
+       !chat.archivedAt &&
+       !chat.place &&
+       chat.messages.length > 0 &&
++      !projectChats[chat.id] &&
+       !lessons[chat.id] &&
++      !made.has(chat.id) &&
+       (!thread || chat.updatedAt > thread.updatedAt)
+     )
+       thread = chat;

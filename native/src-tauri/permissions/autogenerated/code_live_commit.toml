@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-live-commit"
+description = "Enables the code_live_commit command without any pre-configured scope."
+commands.allow = ["code_live_commit"]
+
+[[permission]]
+identifier = "deny-code-live-commit"
+description = "Denies the code_live_commit command without any pre-configured scope."
+commands.deny = ["code_live_commit"]

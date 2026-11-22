@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-lsp-stop"
+description = "Enables the code_lsp_stop command without any pre-configured scope."
+commands.allow = ["code_lsp_stop"]
+
+[[permission]]
+identifier = "deny-code-lsp-stop"
+description = "Denies the code_lsp_stop command without any pre-configured scope."
+commands.deny = ["code_lsp_stop"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-code-lsp-status"
+description = "Enables the code_lsp_status command without any pre-configured scope."
+commands.allow = ["code_lsp_status"]
+
+[[permission]]
+identifier = "deny-code-lsp-status"
+description = "Denies the code_lsp_status command without any pre-configured scope."
+commands.deny = ["code_lsp_status"]
