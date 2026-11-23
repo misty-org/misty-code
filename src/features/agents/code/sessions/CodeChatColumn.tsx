@@ -1,20 +1,20 @@
 import { X } from "lucide-react";
 import type { AgentProfile } from "@/shared/schemas";
 import { cn, IconButton, Separator, Surface } from "@misty/ui";
-import { useMistyStore } from "../../conversations/state/useMistyStore";
+import { useMistyStore } from "../../conversations/state/use_misty_store";
 import { AgentWorkspaceConversation } from "../../conversations/view/AgentWorkspaceConversation";
-import { openAgentsHub } from "../../hub/agentsHubStore";
+import { openAgentsHub } from "../../hub/agents_hub_store";
 import { ChatTitle } from "../../page/AgentConversationHeading";
 import {
   chatColumnClass,
   floatingHeaderClass,
   studioBarClass,
 } from "../../page/AgentsTaskContent";
-import { useAgentAccountId } from "../../personal/agentAccount";
+import { useAgentAccountId } from "../../personal/agent_account";
 import { AgentAvatar } from "../../personal/AgentAvatar";
-import { usePersonalAgentsStore } from "../../personal/personalAgentsStore";
-import { useChatFolders } from "../../shared-folders/chatFolder";
-import { updateCodePageLayout } from "../codePageStore";
+import { usePersonalAgentsStore } from "../../personal/personal_agents_store";
+import { useChatFolders } from "../../shared-folders/chat_folder";
+import { updateCodePageLayout } from "../code_page_store";
 
 export function chatAgentOf(
   agents: readonly AgentProfile[],

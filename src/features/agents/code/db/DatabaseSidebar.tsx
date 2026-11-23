@@ -14,8 +14,8 @@ import {
 } from "@misty/ui";
 import { uiPx } from "@misty/ui";
 import { ConnectionDialog } from "./ConnectionDialog";
-import type { SavedConnection, SchemaTable } from "./dbApi";
-import { useDbStore, type SchemaState } from "./dbStore";
+import type { SavedConnection, SchemaTable } from "./db_api";
+import { useDbStore, type SchemaState } from "./db_store";
 
 type Line =
   | { kind: "connection"; key: string; connection: SavedConnection; open: boolean }

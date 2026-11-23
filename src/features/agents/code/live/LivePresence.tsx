@@ -1,9 +1,9 @@
 import { Text, Tooltip } from "@misty/ui";
 import { PersonAvatar } from "./PersonAvatar";
-import { personTone } from "@/shared/lib/personTone";
-import { useRoomView } from "./livePeople";
-import { runningSession } from "./liveSession";
-import { activeJoin, useLiveStore } from "./liveStore";
+import { personTone } from "@/shared/lib/person_tone";
+import { useRoomView } from "./live_people";
+import { runningSession } from "./live_session";
+import { activeJoin, useLiveStore } from "./live_store";
 
 export function LivePresence() {
   const join = useLiveStore((state) => activeJoin(state.joins));

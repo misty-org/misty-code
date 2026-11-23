@@ -1,7 +1,7 @@
 import { LSPPlugin, Workspace, type LSPClient, type WorkspaceFile } from "@codemirror/lsp-client";
 import type { Text } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
-import { joinPath, useFilesStore } from "../../context-panel/files/filesStore";
+import { joinPath, useFilesStore } from "../../context-panel/files/files_store";
 
 type FileUpdate = ReturnType<Workspace["syncFiles"]>[number];
 

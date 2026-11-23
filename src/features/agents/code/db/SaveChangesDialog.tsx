@@ -10,9 +10,9 @@ import {
   DialogTitle,
   FieldError,
 } from "@misty/ui";
-import { errorText } from "./dbApi";
-import { rowKey, useDbStore, type DbTab } from "./dbStore";
-import { updateStatement } from "./sqlText";
+import { errorText } from "./db_api";
+import { rowKey, useDbStore, type DbTab } from "./db_store";
+import { updateStatement } from "./sql_text";
 
 export function SaveChangesDialog(props: { tab: DbTab; keyColumns: string[]; onClose(): void }) {
   const { tab, keyColumns } = props;

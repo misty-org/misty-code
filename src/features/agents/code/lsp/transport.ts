@@ -1,5 +1,5 @@
 import type { Transport } from "@codemirror/lsp-client";
-import { lspApi } from "./lspApi";
+import { lspApi } from "./lsp_api";
 
 function localResult(method: string, params: unknown, rootUri: string): { result: unknown } | null {
   switch (method) {

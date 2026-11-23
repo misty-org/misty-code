@@ -12,9 +12,9 @@ import {
   Textarea,
   type TextTone,
 } from "@misty/ui";
-import { getFileTreeIconSvg } from "../../context-panel/files/fileIcons";
-import { useFilesStore } from "../../context-panel/files/filesStore";
-import { resolveWorkspaceRepository } from "../../context-panel/files/repositorySelection";
+import { getFileTreeIconSvg } from "../../context-panel/files/file_icons";
+import { useFilesStore } from "../../context-panel/files/files_store";
+import { resolveWorkspaceRepository } from "../../context-panel/files/repository_selection";
 import { ChangesSkeleton } from "../../context-panel/PanelSkeletons";
 import {
   absoluteOf,
@@ -28,11 +28,11 @@ import {
   NotRepoState,
   StatusErrorState,
 } from "../../context-panel/git/ChangesStates";
-import { useChangesSelection, useRefreshWhileWorking } from "../../context-panel/git/changesHooks";
+import { useChangesSelection, useRefreshWhileWorking } from "../../context-panel/git/changes_hooks";
 import { DiffView } from "../../context-panel/git/DiffView";
-import type { GitFileEntry } from "../../context-panel/git/gitApi";
+import type { GitFileEntry } from "../../context-panel/git/git_api";
 import { useGitStore } from "../../context-panel/git/store";
-import { useChangesActions } from "../../context-panel/git/useChangesActions";
+import { useChangesActions } from "../../context-panel/git/use_changes_actions";
 
 interface Row {
   entry: GitFileEntry;

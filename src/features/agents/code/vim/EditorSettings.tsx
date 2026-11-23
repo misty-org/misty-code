@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { DesktopSettingsRow as Row, DesktopSettingsSection as Section } from "@/features/settings";
-import { editorFonts, editorThemes } from "@/shared/lib/codemirror/editorThemes";
+import { editorFonts, editorThemes } from "@/shared/lib/codemirror/editor_themes";
 import { Button, OptionSelect, Switch } from "@misty/ui";
-import { useEditorFont, useEditorTheme } from "../editorAppearance";
-import { useEditorNvimMappings, useEditorVim, useEditorWordWrap } from "./editorVimSettings";
-import { useNvimConfig, type NvimConfig } from "./nvimConfig";
-import { runnable } from "./vimAddon";
+import { useEditorFont, useEditorTheme } from "../editor_appearance";
+import { useEditorNvimMappings, useEditorVim, useEditorWordWrap } from "./editor_vim_settings";
+import { useNvimConfig, type NvimConfig } from "./nvim_config";
+import { runnable } from "./vim_addon";
 
 function configLine(config: NvimConfig | null, error: string | null): string {
   if (error) return error;

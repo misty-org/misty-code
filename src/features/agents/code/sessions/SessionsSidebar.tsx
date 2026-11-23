@@ -1,9 +1,9 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { RotateCw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useCachedResource } from "@/api/cache/cached-resource";
+import { useCachedResource } from "@/api/cache/cached_resource";
 import { EngineMark } from "@/features/engine-config/EngineMark";
-import { useNow } from "@/shared/hooks/useNow";
+import { useNow } from "@/shared/hooks/use_now";
 import { uiPx } from "@misty/ui";
 import type { AgentProfile } from "@/shared/schemas";
 import {
@@ -18,23 +18,23 @@ import {
   Text,
   TreeRow,
 } from "@misty/ui";
-import type { GlobalAiConversation } from "../../conversations/state/conversationTypes";
-import { useMistyStore } from "../../conversations/state/useMistyStore";
-import { resumeInNewChat } from "../../conversations/startChat";
+import type { GlobalAiConversation } from "../../conversations/state/conversation_types";
+import { useMistyStore } from "../../conversations/state/use_misty_store";
+import { resumeInNewChat } from "../../conversations/start_chat";
 import {
   listEngineSessions,
   readChatSession,
   rescanEngineSessions,
   sessionsByFolder,
   type EngineSession,
-} from "../../conversations/view/engine/engineHistory";
-import { defaultEngineAgent } from "../../engines/defaultEngine";
-import { folderName, mistyEngine, useEnginesList } from "../../engines/enginesApi";
-import { openAgentsHub } from "../../hub/agentsHubStore";
+} from "../../conversations/view/engine/engine_history";
+import { defaultEngineAgent } from "../../engines/default_engine";
+import { folderName, mistyEngine, useEnginesList } from "../../engines/engines_api";
+import { openAgentsHub } from "../../hub/agents_hub_store";
 import { AgentAvatar } from "../../personal/AgentAvatar";
-import { usePersonalAgentsStore } from "../../personal/personalAgentsStore";
-import { useChatFolders, useProjectChats } from "../../shared-folders/chatFolder";
-import { useCodePageLayout } from "../codePageStore";
+import { usePersonalAgentsStore } from "../../personal/personal_agents_store";
+import { useChatFolders, useProjectChats } from "../../shared-folders/chat_folder";
+import { useCodePageLayout } from "../code_page_store";
 import { chatAgentOf, openCodeChat } from "./CodeChatColumn";
 import { NewSessionControl } from "./NewSessionControl";
 

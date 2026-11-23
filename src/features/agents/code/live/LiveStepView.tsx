@@ -1,12 +1,12 @@
 import { Eye, Undo2, X } from "lucide-react";
 import { useState } from "react";
 import { ActionBar, CodeDiff, EmptyState, IconButton, ScrollArea, Text, TopBar } from "@misty/ui";
-import { diffLines } from "./liveDiff";
-import { useRoomView } from "./livePeople";
-import type { LiveRoom } from "./liveRoom";
-import { undoStep, textWithoutStep, type StepRecorder } from "./liveSteps";
-import { useLiveStore } from "./liveStore";
-import { authorKey, mainAuthor, type LiveStep } from "./liveTypes";
+import { diffLines } from "./live_diff";
+import { useRoomView } from "./live_people";
+import type { LiveRoom } from "./live_room";
+import { undoStep, textWithoutStep, type StepRecorder } from "./live_steps";
+import { useLiveStore } from "./live_store";
+import { authorKey, mainAuthor, type LiveStep } from "./live_types";
 
 export function LiveStepView(props: { room: LiveRoom; recorder: StepRecorder; stepId: string }) {
   const { room, recorder, stepId } = props;

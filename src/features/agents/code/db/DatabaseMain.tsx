@@ -12,7 +12,7 @@ import {
   SplitPane as Panel,
   SplitPanes as PanelGroup,
 } from "@misty/ui";
-import { useDbStore, primaryKeyOf, tableOf, type DbTab } from "./dbStore";
+import { useDbStore, primaryKeyOf, tableOf, type DbTab } from "./db_store";
 import { ResultsGrid, ResultsSkeleton } from "./ResultsGrid";
 import { SaveChangesDialog } from "./SaveChangesDialog";
 import { SqlEditor } from "./SqlEditor";

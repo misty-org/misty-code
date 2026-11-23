@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSpaceWindowStore } from "@/features/app-windows";
 import { Button, EmptyState, ListRow, ListRowSkeleton, SectionHeading, Text } from "@misty/ui";
-import { codeSessionsApi, type CodeSession } from "./codeSessionsApi";
+import { codeSessionsApi, type CodeSession } from "./code_sessions_api";
 import { GoLiveDialog } from "./GoLiveDialog";
-import { liveApi, liveErrorText } from "./liveApi";
+import { liveApi, liveErrorText } from "./live_api";
 import { LiveJoined } from "./LiveJoined";
-import { joinSession, restoreJoin } from "./liveSession";
-import { useLiveStore } from "./liveStore";
+import { joinSession, restoreJoin } from "./live_session";
+import { useLiveStore } from "./live_store";
 
 const listEveryMs = 30_000;
 

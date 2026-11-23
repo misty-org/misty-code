@@ -21,8 +21,8 @@ import {
   type DbKind,
   type SavedConnection,
   type SslMode,
-} from "./dbApi";
-import { useDbStore } from "./dbStore";
+} from "./db_api";
+import { useDbStore } from "./db_store";
 
 interface Draft {
   name: string;

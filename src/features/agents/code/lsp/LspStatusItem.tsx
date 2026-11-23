@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { Button, Spinner, Text, Tooltip } from "@misty/ui";
 import { retryLanguageServers } from "./install";
 import { lspFileKind, serverNames } from "./languages";
-import type { LspInstallState } from "./lspStore";
-import { useLspStore } from "./lspStore";
+import type { LspInstallState } from "./lsp_store";
+import { useLspStore } from "./lsp_store";
 
 function installLabel(server: string, progress: LspInstallState["progress"]): string {
   const percent =

@@ -1,6 +1,6 @@
 import { itemToneClass, Text, Tooltip } from "@misty/ui";
-import { personTone } from "@/shared/lib/personTone";
-import { authorKey, mainAuthor, ownerKey, type LivePerson, type LiveStep } from "./liveTypes";
+import { personTone } from "@/shared/lib/person_tone";
+import { authorKey, mainAuthor, ownerKey, type LivePerson, type LiveStep } from "./live_types";
 
 const rowHeight = 32;
 const column = 14;

@@ -10,10 +10,10 @@ import {
   Skeleton,
   Text,
 } from "@misty/ui";
-import { gitApi, gitErrorText } from "../../context-panel/git/gitApi";
-import { liveApi, liveErrorText } from "./liveApi";
-import { goLive } from "./liveSession";
-import type { LiveRepo } from "./liveTypes";
+import { gitApi, gitErrorText } from "../../context-panel/git/git_api";
+import { liveApi, liveErrorText } from "./live_api";
+import { goLive } from "./live_session";
+import type { LiveRepo } from "./live_types";
 
 export function GoLiveDialog(props: {
   open: boolean;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage, type AvatarSize, type AvatarTone } from "@misty/ui";
-import { spacesGateway } from "../../spaces-gateway/spacesGateway";
+import { spacesGateway } from "../../spaces-gateway/spaces_gateway";
 
 const initials = (name: string) =>
   name

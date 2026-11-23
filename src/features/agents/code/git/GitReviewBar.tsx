@@ -1,8 +1,8 @@
 import { getChunks, rejectChunk } from "@codemirror/merge";
-import { useFilesStore } from "../../context-panel/files/filesStore";
+import { useFilesStore } from "../../context-panel/files/files_store";
 import { Button, Surface, Text } from "@misty/ui";
-import { editorCommandsOf } from "../editorCommands";
-import { reviewViews, useGitReview } from "./gitReviewStore";
+import { editorCommandsOf } from "../editor_commands";
+import { reviewViews, useGitReview } from "./git_review_store";
 
 function undoAll(path: string) {
   const view = reviewViews.get(path);

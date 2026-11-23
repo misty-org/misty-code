@@ -8,11 +8,11 @@ contract between them: what the page takes from Misty, what Misty kept for it, a
 The files keep Misty's paths, so their imports resolve once they are back in place:
 
 - **The chat's context panel** (`features/agents/context-panel`): the file editor (`editor/EditorPane`), its
-  commands (`editor/editorCommands`), its addon types and the `editorAddons` port (`editor/editorAddons`),
-  word wrap (`editor/editorSettings`), files, git and the terminal.
-- **Agents:** `personal/*`, `conversations/*`, `engines/*`, `runs/*`, `shared-folders/chatFolder` (project
-  chats, `chat_open_in_code`), `spaces-gateway/spacesGateway`, `page/*`, `hub/*`.
-- **Shared:** `shared/lib/codemirror/*`, `shared/lib/personTone`, `shared/lib/deviceSetting`,
+  commands (`editor/editor_commands`), its addon types and the `editorAddons` port (`editor/editor_addons`),
+  word wrap (`editor/editor_settings`), files, git and the terminal.
+- **Agents:** `personal/*`, `conversations/*`, `engines/*`, `runs/*`, `shared-folders/chat_folder` (project
+  chats, `chat_open_in_code`), `spaces-gateway/spaces_gateway`, `page/*`, `hub/*`.
+- **Shared:** `shared/lib/codemirror/*`, `shared/lib/person_tone`, `shared/lib/device_setting`,
   `shared/platform/tauri`, `@/native/invoke`, `features/settings` and `SettingsControls`, `features/shortcuts`,
   `features/app-windows`, `features/engine-config/EngineMark`.
 - **Packages:** `@codemirror/lang-sql`, `@codemirror/lint`, `@codemirror/lsp-client`, `@codemirror/merge`,
@@ -21,15 +21,15 @@ The files keep Misty's paths, so their imports resolve once they are back in pla
 ## 2. What Misty kept on purpose
 
 - **The editor seam.** The chat's editor reads its addons from the `editorAddons` port
-  (`context-panel/editor/editorAddons.ts`) and uses none while nothing provides it. `code/useEditorAddons.ts`
+  (`context-panel/editor/editor_addons.ts`) and uses none while nothing provides it. `code/use_editor_addons.ts`
   is the provider.
-- **Live sessions' host.** `features/spaces/apps/pageMisty.ts` still builds the `code` page's misty-sdk client and
+- **Live sessions' host.** `features/spaces/apps/page_misty.ts` still builds the `code` page's misty-sdk client and
   its rooms (`codeRoomSource`, the `code-sessions/…/collaboration-ticket` endpoint), and misty-server still serves
   code sessions.
 - **Project chats.** Chats with a picked project folder stay in `misty.db`; while Code is out they show and run
   as ordinary chats (in the sidebar, with the agent's own voice).
 - **`chat_open_in_code`** (`src-tauri/features/engines/open_in_code.rs`), which moves a scratch chat into a project.
-- **The `quiet` option** of `assembleAgentPrompt` (`features/agents/bots/botPrompt.ts`), which project chats used.
+- **The `quiet` option** of `assembleAgentPrompt` (`features/agents/bots/bot_prompt.ts`), which project chats used.
 
 ## 3. Where Misty mounted it
 
@@ -37,25 +37,25 @@ The files keep Misty's paths, so their imports resolve once they are back in pla
 
 | Misty file | What it did there |
 | --- | --- |
-| `features/agents/methods/AgentWorkspaceFrame.tsx`, `page/useAgentsPageState.ts` | The `code` workspace page and `?view=code` |
-| `app/layouts/DesktopLayout/sidebarPinsStore.ts`, `SpaceNavigator.tsx` | Code as a pinned place in the sidebar; project chats kept out of the sidebar's list |
-| `app/layouts/DesktopLayout/spaceNavigation.ts`, `search/useSearchHits.tsx` | Opening a project chat in Code; Code under Go to |
+| `features/agents/methods/AgentWorkspaceFrame.tsx`, `page/use_agents_page_state.ts` | The `code` workspace page and `?view=code` |
+| `app/layouts/DesktopLayout/sidebar_pins_store.ts`, `SpaceNavigator.tsx` | Code as a pinned place in the sidebar; project chats kept out of the sidebar's list |
+| `app/layouts/DesktopLayout/space_navigation.ts`, `search/UseSearchHits.tsx` | Opening a project chat in Code; Code under Go to |
 | `app/layouts/DesktopLayout/WorkspaceCanvas.tsx` | The window's bottom bar, shown on the Code page |
-| `app/layouts/DesktopLayout/BottomBarItems.tsx`, `bottomBarStore.ts` | The Code bar items (vim, live, problems, cursor, language, server, theme, terminal, branch) |
-| `app/SettingsSections.tsx`, `features/settings/settingsRegistry.tsx`, `settingsTypes.ts` | Settings › Code: Editor and Collaboration |
+| `app/layouts/DesktopLayout/BottomBarItems.tsx`, `bottom_bar_store.ts` | The Code bar items (vim, live, problems, cursor, language, server, theme, terminal, branch) |
+| `app/SettingsSections.tsx`, `features/settings/SettingsRegistry.tsx`, `settings_types.ts` | Settings › Code: Editor and Collaboration |
 | `features/agents/index.ts` | `EditorSettings`, `CollaborationSettings`, `openCodeChat`, the bar items |
 | `features/agents/conversations/view/AgentMessage.tsx`, `context-panel/AgentContextPanel.tsx`, `SessionPanel.tsx` | Open in Code (card and buttons) |
-| `context-panel/files/folderFileSearch.ts`, `git/ChangesFileContextMenu.tsx` | Opening a file in Code when it shows |
-| `features/agents/runs/local-run/runBody.ts` | Project chats ran quiet |
-| `features/agents/tutor/cursor/tutorHandoff.ts` | Project chats kept out of an agent's thread |
+| `context-panel/files/folder_file_search.ts`, `git/ChangesFileContextMenu.tsx` | Opening a file in Code when it shows |
+| `features/agents/runs/local-run/run_body.ts` | Project chats ran quiet |
+| `features/agents/tutor/cursor/tutor_handoff.ts` | Project chats kept out of an agent's thread |
 | `src-tauri/features/lib.rs`, `app/handlers/more_commands.rs`, `app/lifecycle.rs`, `browser/app_windows/lifecycle.rs` | The `code` module, its commands, closing language servers |
 | `src-tauri/Cargo.toml` | `tokio-postgres`, `tokio-postgres-rustls`, `rustls-native-certs` |
 | `src-tauri/tauri-permissions/app_commands.in`, `actions/actions.toml` | The 30 `code_*` commands |
 | `package.json` | The packages above |
 
 The patch also carries the Lab's hunks in seven files both used (`AgentWorkspaceFrame.tsx`,
-`useAgentsPageState.ts`, `features/agents/index.ts`, `sidebarPinsStore.ts`, `SpaceNavigator.tsx`,
-`useSearchHits.tsx`, `tutorHandoff.ts`). Bringing Code back alone, drop the Lab's hunks there, or plug the Lab
+`use_agents_page_state.ts`, `features/agents/index.ts`, `sidebar_pins_store.ts`, `SpaceNavigator.tsx`,
+`UseSearchHits.tsx`, `tutor_handoff.ts`). Bringing Code back alone, drop the Lab's hunks there, or plug the Lab
 back first.
 
 ## 4. Plugging it back in
@@ -65,6 +65,6 @@ back first.
    `native/src-tauri/permissions/autogenerated/*.toml` to `src-tauri/permissions/autogenerated/`.
 3. `git apply ../misty-code/integration/misty.patch` from Misty's root. It was written against Misty as of
    2026-11-22; where Misty has moved on, apply the hunks by hand using the table above.
-4. Provide the editor's addons: in `src/app/featureSeams.ts`, `editorAddons.provide(useEditorAddons)`
-   (from `context-panel/editor/editorAddons` and `code/useEditorAddons`).
+4. Provide the editor's addons: in `src/app/feature_seams.ts`, `editorAddons.provide(useEditorAddons)`
+   (from `context-panel/editor/editor_addons` and `code/use_editor_addons`).
 5. `npm install` in Misty, then fix the tests that mention Code (they were updated or dropped when it left).

@@ -11,11 +11,11 @@ import {
   Text,
   ToolbarDivider,
 } from "@misty/ui";
-import { useEditorReveal } from "../context-panel/editor/editorReveal";
-import { errorText } from "../context-panel/projectApi";
-import { filesApi, type SearchHit } from "../context-panel/files/filesApi";
-import { getFileTreeIconSvg } from "../context-panel/files/fileIcons";
-import { fileName, useFilesStore } from "../context-panel/files/filesStore";
+import { useEditorReveal } from "../context-panel/editor/editor_reveal";
+import { errorText } from "../context-panel/project_api";
+import { filesApi, type SearchHit } from "../context-panel/files/files_api";
+import { getFileTreeIconSvg } from "../context-panel/files/file_icons";
+import { fileName, useFilesStore } from "../context-panel/files/files_store";
 
 export const useProjectSearch = create<{
   query: string;

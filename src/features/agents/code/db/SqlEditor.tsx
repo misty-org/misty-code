@@ -3,9 +3,9 @@ import { Prec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import { useEffect, useMemo, useRef } from "react";
-import { mistyEditorTheme } from "@/shared/lib/codemirror/mistyTheme";
-import type { DbKind, DbSchema } from "./dbApi";
-import { completionSchema, defaultSchema } from "./sqlText";
+import { mistyEditorTheme } from "@/shared/lib/codemirror/misty_theme";
+import type { DbKind, DbSchema } from "./db_api";
+import { completionSchema, defaultSchema } from "./sql_text";
 
 const BASIC_SETUP = { foldGutter: false, highlightActiveLine: true };
 

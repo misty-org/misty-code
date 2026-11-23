@@ -1,6 +1,6 @@
 import { DesktopSettingsRow as Row, DesktopSettingsSection as Section } from "@/features/settings";
 import { DropdownControl, SwitchControl } from "@/features/settings/SettingsControls";
-import { cursorTones, useCursorTone, useShowInLive } from "./liveVisibility";
+import { cursorTones, useCursorTone, useShowInLive } from "./live_visibility";
 
 const toneChoices = [
   { value: "auto", label: "Automatic" },

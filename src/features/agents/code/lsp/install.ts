@@ -1,7 +1,7 @@
-import { errorText } from "../../context-panel/projectApi";
+import { errorText } from "../../context-panel/project_api";
 import type { LspLanguage } from "./languages";
-import { lspApi } from "./lspApi";
-import { useLspStore } from "./lspStore";
+import { lspApi } from "./lsp_api";
+import { useLspStore } from "./lsp_store";
 
 const pending = new Map<LspLanguage, Promise<void>>();
 

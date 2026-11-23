@@ -15,8 +15,8 @@ import {
   notify,
 } from "@misty/ui";
 import { uiPx } from "@misty/ui";
-import type { CellValue, QueryResult } from "./dbApi";
-import { cellText } from "./sqlText";
+import type { CellValue, QueryResult } from "./db_api";
+import { cellText } from "./sql_text";
 
 const cellClass = "flex h-8 w-48 shrink-0 items-center px-2";
 const indexClass = "flex h-8 w-14 shrink-0 items-center justify-end pr-3";

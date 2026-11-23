@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from "react";
-import { restoreJoin } from "./liveSession";
-import { useLiveStore } from "./liveStore";
+import { restoreJoin } from "./live_session";
+import { useLiveStore } from "./live_store";
 
 export { LiveMain, useLiveMainShown } from "./LiveMain";
 export { LivePresence } from "./LivePresence";
 export { LiveSidebar } from "./LiveSidebar";
-export { useLiveAddon } from "./useLiveAddon";
+export { useLiveAddon } from "./use_live_addon";
 
 export function useLiveWorkFolder(
   spaceFolder: string,

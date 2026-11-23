@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, type ReactNode } from "react";
 import { create } from "zustand";
-import { editorThemes } from "@/shared/lib/codemirror/editorThemes";
+import { editorThemes } from "@/shared/lib/codemirror/editor_themes";
 import {
   Button,
   DropdownMenu,
@@ -22,12 +22,12 @@ import {
   Text,
   Tooltip,
 } from "@misty/ui";
-import { fileName, useFilesStore } from "../context-panel/files/filesStore";
+import { fileName, useFilesStore } from "../context-panel/files/files_store";
 import { LineCounts } from "../context-panel/git/LineCounts";
 import { useGitStore } from "../context-panel/git/store";
-import { updateCodePageLayout, useCodePageLayout } from "./codePageStore";
-import { useCodeStatus } from "./codeStatus";
-import { useEditorTheme } from "./editorAppearance";
+import { updateCodePageLayout, useCodePageLayout } from "./code_page_store";
+import { useCodeStatus } from "./code_status";
+import { useEditorTheme } from "./editor_appearance";
 import { LivePresence } from "./live";
 import { LspStatusItem } from "./lsp";
 

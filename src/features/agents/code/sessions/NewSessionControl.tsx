@@ -9,12 +9,12 @@ import {
   MenuRadioItem,
   MenuTrigger,
 } from "@misty/ui";
-import type { GlobalAiConversation } from "../../conversations/state/conversationTypes";
-import { useMistyStore } from "../../conversations/state/useMistyStore";
-import { mistyEngine } from "../../engines/enginesApi";
+import type { GlobalAiConversation } from "../../conversations/state/conversation_types";
+import { useMistyStore } from "../../conversations/state/use_misty_store";
+import { mistyEngine } from "../../engines/engines_api";
 import { AgentAvatar } from "../../personal/AgentAvatar";
-import { usePersonalAgentsStore } from "../../personal/personalAgentsStore";
-import { useChatFolders, useProjectChats } from "../../shared-folders/chatFolder";
+import { usePersonalAgentsStore } from "../../personal/personal_agents_store";
+import { useChatFolders, useProjectChats } from "../../shared-folders/chat_folder";
 import { chatAgentOf, openCodeChat } from "./CodeChatColumn";
 
 function lastAgentIn(

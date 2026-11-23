@@ -15,11 +15,11 @@ import {
   Text,
   TopBar,
 } from "@misty/ui";
-import { liveErrorText } from "./liveApi";
-import type { CommitPreview } from "./liveCommits";
-import { endSession, previewEnd, type EndStage } from "./liveEnd";
-import { useLiveStore } from "./liveStore";
-import type { LiveJoin, LiveOutcome } from "./liveTypes";
+import { liveErrorText } from "./live_api";
+import type { CommitPreview } from "./live_commits";
+import { endSession, previewEnd, type EndStage } from "./live_end";
+import { useLiveStore } from "./live_store";
+import type { LiveJoin, LiveOutcome } from "./live_types";
 
 const stageWords: Record<EndStage, string> = {
   commits: "Making a commit for each person",

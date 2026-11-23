@@ -1,6 +1,6 @@
 import { LiveEndFlow } from "./LiveEndFlow";
-import { runningSession } from "./liveSession";
-import { activeJoin, useLiveStore } from "./liveStore";
+import { runningSession } from "./live_session";
+import { activeJoin, useLiveStore } from "./live_store";
 import { LiveStepView } from "./LiveStepView";
 
 function useMainView() {

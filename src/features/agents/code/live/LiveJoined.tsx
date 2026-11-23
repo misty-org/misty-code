@@ -10,13 +10,13 @@ import {
   Text,
 } from "@misty/ui";
 import { PersonAvatar } from "./PersonAvatar";
-import { personTone } from "@/shared/lib/personTone";
-import { liveErrorText } from "./liveApi";
+import { personTone } from "@/shared/lib/person_tone";
+import { liveErrorText } from "./live_api";
 import { LiveLanes } from "./LiveLanes";
-import { useRoomView } from "./livePeople";
-import { leaveSession, retryJoin, runningSession } from "./liveSession";
-import { useLiveStore } from "./liveStore";
-import { mainAuthor, type LiveJoin, type LiveStep } from "./liveTypes";
+import { useRoomView } from "./live_people";
+import { leaveSession, retryJoin, runningSession } from "./live_session";
+import { useLiveStore } from "./live_store";
+import { mainAuthor, type LiveJoin, type LiveStep } from "./live_types";
 
 function byLine(step: LiveStep): string {
   if (step.author.id === mainAuthor.id) return "main";

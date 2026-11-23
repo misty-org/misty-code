@@ -14,12 +14,12 @@ import {
   Text,
   useNotice,
 } from "@misty/ui";
-import { toolKey } from "../activity/stepSentences";
-import type { GlobalAiMessage } from "../conversations/state/conversationTypes";
-import { useMistyStore } from "../conversations/state/useMistyStore";
-import { useChatFolder, useChatFolders } from "../shared-folders/chatFolder";
-import { useProjectsHome, useProjectsHomePath } from "../shared-folders/projectsHome";
-import { updateCodePageLayout } from "./codePageStore";
+import { toolKey } from "../activity/step_sentences";
+import type { GlobalAiMessage } from "../conversations/state/conversation_types";
+import { useMistyStore } from "../conversations/state/use_misty_store";
+import { useChatFolder, useChatFolders } from "../shared-folders/chat_folder";
+import { useProjectsHome, useProjectsHomePath } from "../shared-folders/projects_home";
+import { updateCodePageLayout } from "./code_page_store";
 
 export function OpenInCodeButton({ conversationId }: { conversationId: string }) {
   const [open, setOpen] = useState(false);

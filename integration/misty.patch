@@ -1,5 +1,5 @@
---- a/src/features/agents/runs/local-run/runBody.ts
-+++ b/src/features/agents/runs/local-run/runBody.ts
+--- a/src/features/agents/runs/local-run/run_body.ts
++++ b/src/features/agents/runs/local-run/run_body.ts
 @@ -103,7 +103,7 @@
      personaInstructions(input.prompt).catch(() => ""),
    ]);
@@ -21,8 +21,8 @@
              ]
                .filter(Boolean)
                .join("\n\n"),
---- a/src/app/layouts/DesktopLayout/spaceNavigation.ts
-+++ b/src/app/layouts/DesktopLayout/spaceNavigation.ts
+--- a/src/app/layouts/DesktopLayout/space_navigation.ts
++++ b/src/app/layouts/DesktopLayout/space_navigation.ts
 @@ -1,5 +1,7 @@
  import {
    defaultAgentOf,
@@ -42,8 +42,8 @@
  }
  
  export function agentChatRoute(agentId: string, conversationId?: string, fresh = false) {
---- a/src/features/settings/settingsRegistry.tsx
-+++ b/src/features/settings/settingsRegistry.tsx
+--- a/src/features/settings/SettingsRegistry.tsx
++++ b/src/features/settings/SettingsRegistry.tsx
 @@ -1,4 +1,5 @@
  import {
 +  CodeXml,
@@ -84,8 +84,8 @@
    block("agents", "agents-list", "Team", "resource"),
    block("agents", "agents-defaults", "Conversations"),
    block("agents", "agents-companion", "Tutor"),
---- a/src/features/settings/settingsTypes.ts
-+++ b/src/features/settings/settingsTypes.ts
+--- a/src/features/settings/settings_types.ts
++++ b/src/features/settings/settings_types.ts
 @@ -33,6 +33,8 @@
    "advanced",
    "fonts",
@@ -272,8 +272,8 @@
  function AgentActivity() {
    const statuses = Object.values(useChatStatuses());
    const working = statuses.filter((status) => status === "working").length;
---- a/src/app/layouts/DesktopLayout/bottomBarStore.ts
-+++ b/src/app/layouts/DesktopLayout/bottomBarStore.ts
+--- a/src/app/layouts/DesktopLayout/bottom_bar_store.ts
++++ b/src/app/layouts/DesktopLayout/bottom_bar_store.ts
 @@ -19,6 +19,14 @@
    "branch",
    "folder",
@@ -396,8 +396,8 @@
              )
            }
          />
---- a/src/features/agents/context-panel/files/folderFileSearch.ts
-+++ b/src/features/agents/context-panel/files/folderFileSearch.ts
+--- a/src/features/agents/context-panel/files/folder_file_search.ts
++++ b/src/features/agents/context-panel/files/folder_file_search.ts
 @@ -1,3 +1,4 @@
 +import { fileRoute, isCodePageShown } from "../../code/codePageStore";
  import { useContextPanel } from "../contextPanelStore";
@@ -654,8 +654,8 @@
              {page === "files" ? <FilesPageSlot /> : null}
              {page === "memory" ? (
                <AgentMemoryPage
---- a/src/features/agents/page/useAgentsPageState.ts
-+++ b/src/features/agents/page/useAgentsPageState.ts
+--- a/src/features/agents/page/use_agents_page_state.ts
++++ b/src/features/agents/page/use_agents_page_state.ts
 @@ -215,12 +215,15 @@
  export type AgentsPageState = ReturnType<typeof useAgentsPageState>;
  
@@ -740,8 +740,8 @@
  export { loadRunEntry } from "./tools/runContexts";
  
  export {
---- a/src/app/layouts/DesktopLayout/sidebarPinsStore.ts
-+++ b/src/app/layouts/DesktopLayout/sidebarPinsStore.ts
+--- a/src/app/layouts/DesktopLayout/sidebar_pins_store.ts
++++ b/src/app/layouts/DesktopLayout/sidebar_pins_store.ts
 @@ -2,7 +2,7 @@
  import { readDeviceState, updateDeviceState } from "@/features/agents";
  import { announceDeviceSetting, onDeviceSettingChange } from "@/shared/lib/deviceSetting";
@@ -841,8 +841,8 @@
          open: () => open(placeRoutes[id]),
        } satisfies SidebarPlace,
      ]),
---- a/src/app/layouts/DesktopLayout/search/useSearchHits.tsx
-+++ b/src/app/layouts/DesktopLayout/search/useSearchHits.tsx
+--- a/src/app/layouts/DesktopLayout/search/UseSearchHits.tsx
++++ b/src/app/layouts/DesktopLayout/search/UseSearchHits.tsx
 @@ -1,7 +1,10 @@
  import {
    Armchair,
@@ -984,8 +984,8 @@
      agents,
      openRoute,
    });
---- a/src/features/agents/tutor/cursor/tutorHandoff.ts
-+++ b/src/features/agents/tutor/cursor/tutorHandoff.ts
+--- a/src/features/agents/tutor/cursor/tutor_handoff.ts
++++ b/src/features/agents/tutor/cursor/tutor_handoff.ts
 @@ -11,7 +11,9 @@
  import { homeSpaceOf, ownSpaceOf } from "../../personal/agentHomeSpace";
  import { usePersonalAgentsStore } from "../../personal/personalAgentsStore";

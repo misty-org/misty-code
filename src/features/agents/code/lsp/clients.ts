@@ -20,8 +20,8 @@ import {
   type LspMessage,
   type LspProgress,
   type LspStarted,
-} from "./lspApi";
-import { useLspStore } from "./lspStore";
+} from "./lsp_api";
+import { useLspStore } from "./lsp_store";
 import { sanitizeServerHtml } from "./sanitize";
 import { ServerTransport } from "./transport";
 import { CodeWorkspace } from "./workspace";

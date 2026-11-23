@@ -22,18 +22,18 @@ import {
   SplitPanes as PanelGroup,
   Surface,
 } from "@misty/ui";
-import { useChatFolder, useChatFolders } from "../shared-folders/chatFolder";
+import { useChatFolder, useChatFolders } from "../shared-folders/chat_folder";
 import { ChatFolderPicker, ProjectPicker } from "../context-panel/ChatFolderPicker";
 import { ContextPanelSkeleton } from "../context-panel/PanelSkeletons";
 import { useGitStore } from "../context-panel/git/store";
 import { FileSearchOverlay } from "../context-panel/files/FileSearchOverlay";
 import { FileTree } from "../context-panel/files/FileTree";
 import { CloseFileDialog, FileTabs } from "../context-panel/files/FilesPanel";
-import { useFilesStore } from "../context-panel/files/filesStore";
-import { useTreePreferences } from "../context-panel/files/treePreferences";
+import { useFilesStore } from "../context-panel/files/files_store";
+import { useTreePreferences } from "../context-panel/files/tree_preferences";
 import type { EditorPaneActions } from "../context-panel/editor/EditorPane";
-import "../context-panel/codeViews.css";
-import { openCodeFileSearch } from "./codeFileScope";
+import "../context-panel/code_views.css";
+import { openCodeFileSearch } from "./code_file_scope";
 import { ProjectSearch, useProjectSearch } from "./ProjectSearch";
 import { useShareCodeBar } from "./CodeBarStatus";
 import {
@@ -41,14 +41,14 @@ import {
   useCodePageLayout,
   useCodePageShown,
   type CodeActivity,
-} from "./codePageStore";
+} from "./code_page_store";
 import { DatabaseMain, DatabaseSidebar } from "./db";
 import { GitReviewBar } from "./git/GitReviewBar";
 import { SourceControl } from "./git/SourceControl";
 import { LiveMain, LiveSidebar, useLiveMainShown, useLiveWorkFolder } from "./live";
 import { CodeChatColumn } from "./sessions/CodeChatColumn";
 import { SessionsSidebar } from "./sessions/SessionsSidebar";
-import { closeChat, openProject, useCodeChat, useCodeProject } from "./useCodeSession";
+import { closeChat, openProject, useCodeChat, useCodeProject } from "./use_code_session";
 
 const EditorPane = lazyTool(() => import("../context-panel/editor/EditorPane"));
 const TerminalPanel = lazyTool(() => import("../context-panel/terminal/TerminalPanel"));
