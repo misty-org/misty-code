@@ -26,8 +26,8 @@ The files keep Misty's paths, so their imports resolve once they are back in pla
 - **The page's host.** `features/spaces/apps/page_misty.ts` still builds the `code` page's misty-sdk client, with
   no rooms of its own: the code-session room source and its ticket endpoint are gone, and misty-server no longer
   serves code sessions. Plugged back in, a live session is a room keyed by its session, opened with misty-sdk's
-  `room(key, options)` like any app (`live_room.ts` already calls `pageMisty(spaceId, "code").room(sessionId,
-  { gc: false })`), and the session list in `code_sessions_api.ts` needs a new home.
+  `room(key, options)` like any app (`live_room.ts` already awaits `pageMisty(spaceId, "code")`, which loads
+  misty-sdk only when first asked, then calls `.room(sessionId, { gc: false })`), and the session list in `code_sessions_api.ts` needs a new home.
 - **Project chats.** Chats with a picked project folder stay in `misty.db`; while Code is out they show and run
   as ordinary chats (in the sidebar, with the agent's own voice).
 - **`chat_open_in_code`** (`src-tauri/features/engines/open_in_code.rs`), which moves a scratch chat into a project.

@@ -145,7 +145,8 @@ async function createRoom(
   me: StepAuthor,
   person: Omit<LivePerson, keyof StepAuthor>,
 ): Promise<LiveRoom> {
-  const live = spacesGateway.get().pageMisty(spaceId, "code").room(sessionId, { gc: false });
+  const misty = await spacesGateway.get().pageMisty(spaceId, "code");
+  const live = misty.room(sessionId, { gc: false });
   const doc = live.doc;
   const access = liveAccess(live);
   let ready = false;
